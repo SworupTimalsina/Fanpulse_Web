@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './App.css';
-import DashboardPage from "./public/home";
+import ArticleEditor from "./public/article";
+import HomePage from "./public/home";
 import Login from './public/login';
 import RegisterPage from "./public/register";
 
@@ -24,7 +25,11 @@ const router = createBrowserRouter(
 
     {
       path: "/dashboard",
-      element: <DashboardPage />
+      element: <HomePage />
+    },
+    {
+      path: "/article",
+      element: <ArticleEditor />
     },
 
   ]
