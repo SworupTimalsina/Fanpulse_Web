@@ -19,14 +19,24 @@ const LoginPage: React.FC = () => {
         loginMutation.mutate(formData, {
             onSuccess: (data) => {
                 console.log("Login Success:", data);
-                localStorage.setItem("token", data.data.token);
-                navigate("/dashboard");
+
+                const token = data?.data?.token;
+                const userId = data?.data?.userId; // Ensure API returns user ID
+
+                if (token && userId) {
+                    localStorage.setItem("token", token);
+                    localStorage.setItem("userId", userId); // Store userId
+                    navigate("/dashboard");
+                } else {
+                    console.error("No token or userId received");
+                }
             },
             onError: (error) => {
                 console.error("Login Failed:", error);
             },
         });
     };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-r from-red-500 to-orange-600 flex items-center justify-center">
