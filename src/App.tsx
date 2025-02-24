@@ -3,10 +3,11 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './App.css';
 import { AuthProvider } from "./private/AuthContext"; // ✅ Import AuthProvider
 import ArticleEditor from "./public/article";
-import HomePage from "./public/home";
+import ArticleDetails from "./public/articledetails";
 import Login from './public/login';
 import RegisterPage from "./public/register";
-import AllArticlesPage from "./public/test";
+import AllArticles from "./public/test";
+import ChatPage from "./public/messages";
 
 const queryClient = new QueryClient();
 
@@ -20,12 +21,20 @@ const router = createBrowserRouter([
     element: <RegisterPage />
   },
   {
-    path: "/dashboard",
-    element: <AllArticlesPage />
-  },
-  {
     path: "/article",
     element: <ArticleEditor />
+  },
+  {
+    path: "/dashboard",
+    element: <AllArticles />
+  },
+  {
+    path: "/article/:id", // ✅ Dynamic route for viewing a single article
+    element: <ArticleDetails />,
+  },
+  {
+    path: "/messages", // ✅ Dynamic route for viewing a single article
+    element: <ChatPage />,
   },
 ]);
 

@@ -45,13 +45,14 @@ export const useCreateArticle = () => {
 export const useGetArticles = () => {
     return useQuery({
         queryKey: ["GET_ARTICLES"],
-        queryFn: () =>
-            axios.get(`http://localhost:3000/api/v1/article`).then((res) => {
-                console.log("Fetched Articles:", res.data); // Debugging
-                return Array.isArray(res.data) ? res.data : []; // Ensure it's an array
-            }),
+        queryFn: async () => {
+            const res = await axios.get("http://localhost:3000/api/v1/article");
+            console.log("API Response:", res.data); // Debugging API response
+            return res.data.data || []; // ✅ Extract `data` array properly
+        },
     });
 };
+
 
 // ✅ GET ARTICLES OF LOGGED-IN USER
 export const useGetUserArticles = (userId: string) => {
@@ -69,10 +70,14 @@ export const useGetUserArticles = (userId: string) => {
 export const useGetArticleById = (id: string) => {
     return useQuery({
         queryKey: ["GET_ARTICLE", id],
-        queryFn: () => axios.get(`http://localhost:3000/api/v1/article/${id}`).then((res) => res.data),
+        queryFn: async () => {
+            const res = await axios.get(`http://localhost:3000/api/v1/article/${id}`);
+            return res.data.data || res.data; // Ensure the correct structure
+        },
         enabled: !!id, // Fetch only when ID is available
     });
 };
+
 
 // ✅ UPDATE ARTICLE
 export const useUpdateArticle = () => {
@@ -99,6 +104,55 @@ export const useDeleteArticle = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["GET_ARTICLES"] });
             queryClient.invalidateQueries({ queryKey: ["GET_USER_ARTICLES"] });
+        },
+    });
+};
+
+// ✅ SEND MESSAGE
+export const useSendMessage = () => {
+    return useMutation({
+        mutationKey: ["SEND_MESSAGE"],
+        mutationFn: async (messageData: { senderId: string; receiverId: string; text: string }) => {
+            const res = await axios.post("http://localhost:3000/api/v1/message/send", messageData);
+            return res.data;
+        },
+    });
+};
+
+export const useGetMessages = (userId: string, currentUserId: string) => {
+    return useQuery({
+        queryKey: ["GET_MESSAGES", userId, currentUserId],
+        queryFn: async () => {
+            if (!userId || !currentUserId) return [];
+            const res = await axios.get(
+                `http://localhost:3000/api/v1/message/${userId}?currentUserId=${currentUserId}`
+            );
+            return res.data.messages || [];
+        },
+        enabled: !!userId && !!currentUserId, // ✅ Fetch only if both IDs exist
+    });
+};
+
+
+// ✅ GET MESSAGES USING conversationId
+export const useGetMessagesByConversation = (conversationId: string) => {
+    return useQuery({
+        queryKey: ["GET_MESSAGES_BY_CONVERSATION", conversationId],
+        queryFn: async () => {
+            if (!conversationId) return [];
+            const res = await axios.get(`http://localhost:3000/api/v1/message/conversation/${conversationId}`);
+            return res.data.messages || [];
+        },
+        enabled: !!conversationId, // Fetch only if conversationId exists
+    });
+};
+
+export const useGetAllUsers = () => {
+    return useQuery({
+        queryKey: ["GET_ALL_USERS"],
+        queryFn: async () => {
+            const res = await axios.get("http://localhost:3000/api/v1/auth/users");
+            return res.data.users || [];
         },
     });
 };
